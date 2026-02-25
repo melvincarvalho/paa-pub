@@ -1,0 +1,113 @@
+<h1>Edit Profile</h1>
+
+{{#success}}<div class="success">{{success}}</div>{{/success}}
+{{#error}}<div class="error">{{error}}</div>{{/error}}
+
+<div class="card mt-1">
+  <h2>Profile Page</h2>
+  <p class="text-muted mb-075">Your public profile page at <a href="/{{username}}/" class="mono">/{{username}}/</a> is rendered from an index.html template using your profile data. If you have customized it and want to start over, you can reset it to the default.</p>
+  <form method="POST" action="/profile/reset-index">
+    <button type="submit" class="btn btn-secondary" data-confirm="Reset your profile page to the default template? Any customizations to index.html will be lost.">Reset Profile Page to Default</button>
+  </form>
+</div>
+
+<form method="POST" action="/profile">
+  <div class="card">
+    <h2>Profile Fields</h2>
+
+    <div class="form-group">
+      <label for="name">Name (foaf:name)</label>
+      <input type="text" id="name" name="name" value="{{name}}" placeholder="Your display name">
+    </div>
+
+    <div class="form-group">
+      <label for="nick">Nickname (foaf:nick)</label>
+      <input type="text" id="nick" name="nick" value="{{nick}}" placeholder="Short handle or alias">
+    </div>
+
+    <div class="form-group">
+      <label for="img">Avatar URL (foaf:img)</label>
+      <input type="url" id="img" name="img" value="{{img}}" placeholder="https://example.com/photo.jpg">
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email (foaf:mbox)</label>
+      <input type="text" id="email" name="email" value="{{email}}" placeholder="you@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="homepage">Homepage (foaf:homepage)</label>
+      <input type="url" id="homepage" name="homepage" value="{{homepage}}" placeholder="https://yoursite.com">
+    </div>
+
+    <div class="form-group">
+      <label for="bio">Bio (vcard:note)</label>
+      <textarea id="bio" name="bio" placeholder="A short bio about yourself">{{bio}}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="role">Role (vcard:role)</label>
+      <input type="text" id="role" name="role" value="{{role}}" placeholder="Developer, Artist, etc.">
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description (schema:description)</label>
+      <textarea id="description" name="description" placeholder="A longer description">{{description}}</textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Custom Triples</h2>
+    <p class="text-muted mb-075">Add custom predicate-object pairs for your WebID subject. Use the template key in your profile page template, e.g. <code>{{=<% %>=}}{{#foaf_knows}}...{{/foaf_knows}}<%={{ }}=%></code>.</p>
+
+    <div class="triple-editor"
+         data-subject="{{webId}}"
+         data-output="arrays"
+         data-predicate-name="custom_predicate[]"
+         data-object-name="custom_object[]"
+         data-show-template-key
+         data-prefixes='{{{prefixesJson}}}'>
+      {{#customTriples}}
+      <div class="te-row">
+        <div class="te-pred-cell">
+          <span class="te-pred-display mono cursor-pointer">{{predicateShort}}</span>
+          <input type="text" class="te-pred-input hidden" name="custom_predicate[]"
+                 value="{{predicate}}" placeholder="Predicate IRI">
+          <button type="button" class="te-search-btn btn btn-secondary btn-xs hidden">Search</button>
+        </div>
+        <div class="te-obj-cell">
+          <input type="text" class="te-obj-input" name="custom_object[]"
+                 value="{{object}}" placeholder="Object value">
+        </div>
+        <span class="te-template-key text-muted mono text-sm nowrap" title="Template key">{{templateKey}}</span>
+        <button type="button" class="btn btn-secondary btn-compact te-remove">Remove</button>
+      </div>
+      {{/customTriples}}
+      <div class="te-add-area"></div>
+    </div>
+  </div>
+
+  <div class="mt-1">
+    <button type="submit" class="btn">Save Profile</button>
+    <a href="/dashboard" class="btn btn-secondary ml-05">Cancel</a>
+  </div>
+</form>
+
+{{#hasSystemTriples}}
+<div class="card mt-1">
+  <h2>System Triples (read-only)</h2>
+  <div class="triple-editor" data-subject="{{webId}}" data-output="none">
+    {{#systemTriples}}
+    <div class="te-row" data-readonly="true">
+      <div class="te-pred-cell">
+        <span class="te-pred-display mono">{{predicateShort}}</span>
+        <input type="hidden" class="te-pred-iri" value="{{predicate}}">
+      </div>
+      <div class="te-obj-cell mono break-all">{{object}}</div>
+    </div>
+    {{/systemTriples}}
+  </div>
+</div>
+{{/hasSystemTriples}}
+
+<script src="/scripts/triple-editor.js"></script>
